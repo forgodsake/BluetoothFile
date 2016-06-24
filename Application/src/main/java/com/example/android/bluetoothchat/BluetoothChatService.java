@@ -480,12 +480,20 @@ public class BluetoothChatService {
                     // Read from the InputStream
                     bytes = mmInStream.read(buffer);
                     byte[] verify = new byte[4];
+                    byte[] file = new byte[bytes-4];
                     System.arraycopy(bytes,0,verify,0,4);
+                    System.arraycopy(bytes,4,file,0,bytes-4);
+                    byte[] encryptFile = {1,1,1,1};
+                    if(verify.equals(encryptFile)){
+                        // Send the obtained bytes to the UI Activity
+                        mHandler.obtainMessage(Constants.FILE_RECEIVE, bytes-4, -1, file)
+                                .sendToTarget();
+                    }else if(bytes<100){
+                        // Send the obtained bytes to the UI Activity
+                        mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer)
+                                .sendToTarget();
+                    }
 
-
-                    // Send the obtained bytes to the UI Activity
-                    mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer)
-                            .sendToTarget();
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
                     connectionLost();

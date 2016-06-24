@@ -324,14 +324,13 @@ public class BluetoothChatFragment extends Fragment {
                     }
                     break;
                 case Constants.FILE_SEND:
-                    byte[] writeBuf = (byte[]) msg.obj;
-                    // construct a string from the buffer
-                    String writeMessage = new String(writeBuf);
                     break;
                 case Constants.FILE_RECEIVE:
-                    byte[] readBuf = (byte[]) msg.obj;
+                    byte[] fileBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
-                    String readMessage = new String(readBuf, 0, msg.arg1);
+                    String filename = new String(fileBuf, 0, msg.arg1);
+                    Toast.makeText(activity, filename,
+                            Toast.LENGTH_SHORT).show();
                     break;
             }
         }
