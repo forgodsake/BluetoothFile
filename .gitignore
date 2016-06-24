@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 # Created by .ignore support plugin (hsz.mobi)
 ### Android template
+=======
+>>>>>>> 0d50d4b3def6bec8dc4dc6b9122b35698e76afaf
 # Built application files
 *.apk
 *.ap_
@@ -40,4 +43,7 @@ captures/
 
 # Keystore files
 *.jks
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0d50d4b3def6bec8dc4dc6b9122b35698e76afaf
