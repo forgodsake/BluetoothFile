@@ -481,13 +481,14 @@ public class BluetoothChatService {
                     bytes = mmInStream.read(buffer);
                     byte[] verify = new byte[4];
                     byte[] file = new byte[bytes-4];
-                    System.arraycopy(bytes,0,verify,0,4);
-                    System.arraycopy(bytes,4,file,0,bytes-4);
+                    System.arraycopy(buffer,0,verify,0,4);
+                    System.arraycopy(buffer,4,file,0,bytes-4);
                     byte[] encryptFile = {1,1,1,1};
-                    if(verify.equals(encryptFile)){
+                    if(memcmp(verify,encryptFile,4)){
                         // Send the obtained bytes to the UI Activity
                         mHandler.obtainMessage(Constants.FILE_RECEIVE, bytes-4, -1, file)
                                 .sendToTarget();
+                        Log.i("blurtooth",new String(file));
                     }else if(bytes<100){
                         // Send the obtained bytes to the UI Activity
                         mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer)
@@ -502,6 +503,29 @@ public class BluetoothChatService {
                     break;
                 }
             }
+        }
+
+        public  boolean memcmp(byte[] data1, byte[] data2, int len) {
+            if (data1 == null && data2 == null) {
+                return true;
+            }
+            if (data1 == null || data2 == null) {
+                return false;
+            }
+            if (data1 == data2) {
+                return true;
+            }
+
+            boolean equals = true;
+            int i;
+            for (i = 0; i < data1.length && i < data2.length && i < len; i++) {
+                if (data1[i] != data2[i]) {
+                    equals = false;
+                    break;
+                }
+            }
+
+            return equals;
         }
 
         /**

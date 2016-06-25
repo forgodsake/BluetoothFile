@@ -17,9 +17,13 @@
 
 package com.example.android.bluetoothchat;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,10 +50,13 @@ import java.io.FileInputStream;
 public class MainActivity extends SampleActivityBase implements View.OnClickListener{
 
     public static final String TAG = "MainActivity";
+    public static final int PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 2;
     private String filename;
 
     // Whether the Log Fragment is currently shown
     private boolean mLogShown;
+
+    private BluetoothChatFragment fragment;
     /**
      * Member object for the chat services
      */
@@ -60,16 +67,73 @@ public class MainActivity extends SampleActivityBase implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if ( PackageManager.PERMISSION_GRANTED != ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
+                    Manifest.permission.READ_CONTACTS)) {
+
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+                Log.i("permission", "we should explain why we need this permission!");
+            } else {
+
+                // No explanation needed, we can request the permission.
+                Log.i("permission", "==request the permission==");
+
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        }
+
         if (savedInstanceState == null) {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            BluetoothChatFragment fragment = new BluetoothChatFragment();
+            fragment = new BluetoothChatFragment();
             transaction.replace(R.id.sample_content_fragment, fragment);
             transaction.commit();
-            mChatService = fragment.mChatService;
         }
 
         findViewById(R.id.button_select).setOnClickListener(this);
         findViewById(R.id.button_send).setOnClickListener(this);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    Log.i("permission", "user granted the permission!");
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Log.i("permission", "user denied the permission!");
+                    Toast.makeText(this,"获取权限失败",Toast.LENGTH_SHORT).show();
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
+
+
+    @Override
+    protected void onResume() {
+        mChatService = fragment.mChatService;
+        super.onResume();
     }
 
     @Override
